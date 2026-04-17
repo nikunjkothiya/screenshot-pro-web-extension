@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapShot Pro Editor</title>
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+  <div class="studio-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <span class="brand-core"></span>
+        </div>
+
+        <div class="brand-copy">
+          <span class="eyebrow">SnapShot Pro Studio</span>
+          <div class="title-row">
+            <h1>Screenshot Editor</h1>
+            <div class="capture-meta">
+              <span id="capture-pill" class="capture-pill">Capture</span>
+              <span id="capture-size" class="capture-size">0 x 0 px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button id="btn-copy" class="action-pill" data-requires-image disabled>Copy</button>
+        <button id="btn-load" class="action-pill action-pill-muted">Load</button>
+        <button id="btn-download" class="action-pill" data-requires-image disabled>Download</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="stage-area">
+        <div id="empty-state" class="empty-state" hidden>
+          <div class="empty-card">
+            <h2>No screenshot loaded</h2>
+            <p>Open a fresh capture from the extension or use Load to bring in a PNG or JPG.</p>
+          </div>
+        </div>
+
+        <div id="canvas-shell" class="canvas-shell" hidden>
+          <div id="canvas-viewport" class="canvas-viewport">
+            <div id="canvas-wrap" class="canvas-wrap">
+              <canvas id="editor-canvas"></canvas>
+              <textarea id="text-editor" class="text-editor" hidden placeholder="Type and press Enter"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="control-shell">
+      <div class="inspector">
+        <div class="inspector-panel is-active" data-panel="pen">
+          <div class="option-group">
+            <span class="option-label">Mode</span>
+            <div class="segmented">
+              <button class="option-btn is-active" data-pen-mode="free" data-requires-image disabled>Free</button>
+              <button class="option-btn" data-pen-mode="straight" data-requires-image disabled>Straight</button>
+            </div>
+          </div>
+          <p class="panel-hint">Draw quick freehand notes or straight connectors directly on the screenshot.</p>
+        </div>
+
+        <div class="inspector-panel" data-panel="highlight">
+          <div class="option-group">
+            <span class="option-label">Highlight</span>
+            <p class="panel-hint">Drag across an area to softly spotlight important content.</p>
+          </div>
+        </div>
+
+        <div class="inspector-panel" data-panel="mask">
+          <div class="option-group">
+            <span class="option-label">Mask</span>
+            <p class="panel-hint">Drag over sensitive content to pixelate it before you copy or download.</p>
+          </div>
+        </div>
+
+        <div class="inspector-panel" data-panel="shape">
+          <div class="option-group">
+            <span class="option-label">Shapes</span>
+            <div class="segmented">
+              <button class="option-btn is-active" data-shape-kind="rect" data-requires-image disabled>Rectangle</button>
+              <button class="option-btn" data-shape-kind="circle" data-requires-image disabled>Circle</button>
+              <button class="option-btn" data-shape-kind="triangle" data-requires-image disabled>Triangle</button>
+            </div>
+          </div>
+
+          <div class="option-group">
+            <span class="option-label">Style</span>
+            <div class="segmented">
+              <button class="option-btn is-active" data-shape-style="stroke" data-requires-image disabled>Stroke</button>
+              <button class="option-btn" data-shape-style="fill" data-requires-image disabled>Fill</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-panel" data-panel="stamp">
+          <div class="option-group">
+            <span class="option-label">Stamps</span>
+            <div class="segmented segmented-wide">
+              <button class="option-btn is-active" data-stamp-kind="arrow" data-requires-image disabled>Arrow</button>
+              <button class="option-btn" data-stamp-kind="star" data-requires-image disabled>Star</button>
+              <button class="option-btn" data-stamp-kind="polygon" data-requires-image disabled>Polygon</button>
+              <button class="option-btn" data-stamp-kind="location" data-requires-image disabled>Location</button>
+              <button class="option-btn" data-stamp-kind="heart" data-requires-image disabled>Heart</button>
+              <button class="option-btn" data-stamp-kind="bubble" data-requires-image disabled>Bubble</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-panel" data-panel="text">
+          <div class="option-group">
+            <span class="option-label">Style</span>
+            <div class="segmented">
+              <button class="option-btn is-active" data-text-style="bold" data-requires-image disabled>B</button>
+              <button class="option-btn" data-text-style="italic" data-requires-image disabled>I</button>
+              <button class="option-btn" data-text-style="underline" data-requires-image disabled>U</button>
+            </div>
+          </div>
+
+          <div class="option-group">
+            <span class="option-label">Align</span>
+            <div class="segmented">
+              <button class="option-btn is-active" data-text-align="left" data-requires-image disabled>Left</button>
+              <button class="option-btn" data-text-align="center" data-requires-image disabled>Center</button>
+              <button class="option-btn" data-text-align="right" data-requires-image disabled>Right</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-panel" data-panel="image">
+          <div class="option-group">
+            <span class="option-label">Image Overlay</span>
+            <button id="btn-add-image" class="option-btn option-btn-cta" data-requires-image disabled>Choose Image</button>
+          </div>
+          <p id="image-helper" class="panel-hint">Choose a PNG or JPG, drop it into the center automatically, then drag or resize it from the corner handles.</p>
+        </div>
+
+        <div id="shared-color-group" class="shared-group">
+          <span class="option-label">Color</span>
+          <div class="swatch-strip">
+            <button class="color-chip" data-color="#ffffff" style="--swatch:#ffffff" title="White" data-requires-image disabled></button>
+            <button class="color-chip is-active" data-color="#38bdf8" style="--swatch:#38bdf8" title="Sky" data-requires-image disabled></button>
+            <button class="color-chip" data-color="#fbbf24" style="--swatch:#fbbf24" title="Amber" data-requires-image disabled></button>
+            <button class="color-chip" data-color="#ef4444" style="--swatch:#ef4444" title="Red" data-requires-image disabled></button>
+            <button class="color-chip" data-color="#22c55e" style="--swatch:#22c55e" title="Green" data-requires-image disabled></button>
+            <button class="color-chip" data-color="#a855f7" style="--swatch:#a855f7" title="Purple" data-requires-image disabled></button>
+          </div>
+        </div>
+
+        <div id="shared-range-group" class="shared-group range-group">
+          <span id="range-label" class="option-label">Range</span>
+          <input id="context-range" type="range" min="2" max="24" value="6" step="1" data-requires-image disabled>
+          <span id="range-value" class="range-value">6</span>
+        </div>
+      </div>
+
+      <div class="dock-bar">
+        <div class="dock-utilities">
+          <button id="btn-undo" class="utility-btn" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 14 4 9l5-5"></path>
+                <path d="M20 20a8 8 0 0 0-8-8H4"></path>
+              </svg>
+            </span>
+            <span>Undo</span>
+          </button>
+          <button id="btn-redo" class="utility-btn" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 14 5-5-5-5"></path>
+                <path d="M4 20a8 8 0 0 1 8-8h8"></path>
+              </svg>
+            </span>
+            <span>Redo</span>
+          </button>
+          <button id="btn-clear" class="utility-btn" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 7h16"></path>
+                <path d="m6 7 1 11a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-11"></path>
+                <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+              </svg>
+            </span>
+            <span>Clear</span>
+          </button>
+        </div>
+
+        <div class="dock-tools">
+          <button class="dock-tool is-active" data-tool="pen" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 5 4 4"></path>
+                <path d="M4 20 9 19 18 10 14 6 5 15 4 20Z"></path>
+              </svg>
+            </span>
+            <span>Pen</span>
+          </button>
+
+          <button class="dock-tool" data-tool="highlight" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 5h10"></path>
+                <path d="m9 5 6 10"></path>
+                <path d="M6 17h12"></path>
+                <path d="M5 19h14"></path>
+              </svg>
+            </span>
+            <span>Highlight</span>
+          </button>
+
+          <button class="dock-tool" data-tool="mask" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="5" width="4" height="4" fill="currentColor" stroke="none"></rect>
+                <rect x="10" y="5" width="4" height="4" fill="currentColor" opacity=".65" stroke="none"></rect>
+                <rect x="15" y="5" width="4" height="4" fill="currentColor" opacity=".35" stroke="none"></rect>
+                <rect x="5" y="10" width="4" height="4" fill="currentColor" opacity=".65" stroke="none"></rect>
+                <rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"></rect>
+                <rect x="15" y="10" width="4" height="4" fill="currentColor" opacity=".65" stroke="none"></rect>
+                <rect x="5" y="15" width="4" height="4" fill="currentColor" opacity=".35" stroke="none"></rect>
+                <rect x="10" y="15" width="4" height="4" fill="currentColor" opacity=".65" stroke="none"></rect>
+                <rect x="15" y="15" width="4" height="4" fill="currentColor" stroke="none"></rect>
+              </svg>
+            </span>
+            <span>Mask</span>
+          </button>
+
+          <button class="dock-tool" data-tool="shape" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="6" width="14" height="12" rx="2"></rect>
+              </svg>
+            </span>
+            <span>Shapes</span>
+          </button>
+
+          <button class="dock-tool" data-tool="stamp" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3 2.6 5.3 5.9.9-4.3 4.2 1 5.9L12 16.6 6.8 19.3l1-5.9L3.5 9.2l5.9-.9L12 3Z"></path>
+              </svg>
+            </span>
+            <span>Stamps</span>
+          </button>
+
+          <button class="dock-tool" data-tool="text" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 6h14"></path>
+                <path d="M12 6v12"></path>
+                <path d="M8 18h8"></path>
+              </svg>
+            </span>
+            <span>Text</span>
+          </button>
+
+          <button class="dock-tool" data-tool="image" data-requires-image disabled>
+            <span class="tool-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4.5" y="5.5" width="15" height="13" rx="2"></rect>
+                <circle cx="10" cy="10" r="1.5"></circle>
+                <path d="m7 16 3.2-3.2a1.5 1.5 0 0 1 2.1 0L15 15.5"></path>
+                <path d="m13.5 14 1.4-1.4a1.5 1.5 0 0 1 2.1 0l2 2"></path>
+              </svg>
+            </span>
+            <span>Image</span>
+          </button>
+        </div>
+
+        <div class="dock-status">
+          <span id="status-text">Preparing editor...</span>
+          <span class="status-note">Tip: use Ctrl/Cmd+Z to undo and Ctrl/Cmd+Shift+Z to redo.</span>
+        </div>
+      </div>
+    </section>
+
+    <input id="image-input" type="file" accept="image/*" hidden>
+    <input id="load-input" type="file" accept="image/*" hidden>
+  </div>
+
+  <script src="editor.js"></script>
+</body>
+</html>
