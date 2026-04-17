@@ -28,7 +28,7 @@ A production-grade Chrome extension that captures screenshots on **any page** â€
 1. Open Chrome and go to `chrome://extensions/`
 2. Enable **Developer Mode** (toggle in the top-right corner)
 3. Click **"Load unpacked"**
-4. Select the **`snapshot-pro/`** folder
+4. Select this project folder
 
 The extension icon will appear in your Chrome toolbar. Pin it for easy access.
 
